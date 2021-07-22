@@ -39,6 +39,7 @@
             <ul id="lists">
                 {% for list in lists %}
                 <li>
+                    <input class="list-check-completed" data-id="{{ list.id }}" type="checkbox" {% if list.completed %} checked {% endif %}/>
                     <a href="{{ list.id}}">
                     {{ list.name }}
                     </a>
@@ -64,9 +65,9 @@
             </ul>
         </div>
         <script>
-            const checkboxes = document.querySelectorAll('.check-completed');
-            for(let i = 0; i < checkboxes.length; i++){
-                const checkbox = checkboxes[i];
+            const checkboxesTodos = document.querySelectorAll('.check-completed');
+            for(let i = 0; i < checkboxesTodos.length; i++){
+                const checkbox = checkboxesTodos[i];
                 checkbox.onchange = function(e){
                     console.log('event', e);
                     const newCompleted = e.target.checked;
@@ -85,6 +86,30 @@
                     })
                     .catch(function(){
                         document.getElementById('error-todo').className = '';
+                    })
+                }
+            }
+            const checkboxesLists = document.querySelectorAll('.list-check-completed');
+            for(let i = 0; i < checkboxesLists.length; i++){
+                const checkbox = checkboxesLists[i];
+                checkbox.onchange = function(e){
+                    console.log('event', e);
+                    const newCompleted = e.target.checked;
+                    const listId = e.target.dataset['id'];
+                    fetch('/lists/' + listId + '/set-completed', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            'completed': newCompleted
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(function(){
+                        document.getElementById('error-list').className = 'hidden';
+                    })
+                    .catch(function(){
+                        document.getElementById('error-list').className = '';
                     })
                 }
             }
